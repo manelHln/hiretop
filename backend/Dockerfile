@@ -1,7 +1,7 @@
 FROM eclipse-temurin:21-jdk-alpine as build
 
 
-WORKDIR /app
+WORKDIR /app/backend
 
 
 COPY mvnw .
