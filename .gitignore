@@ -34,4 +34,4 @@ build/
 
 *.env
 
-secrets.properties
+application.properties

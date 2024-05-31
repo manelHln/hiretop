@@ -2,7 +2,7 @@ ARG NODE_VERSION=20.11.0
 
 FROM node:${NODE_VERSION}-alpine
 
-WORKDIR /app
+WORKDIR /app/frontend
 
 COPY package.json package-lock.json ./
 

@@ -37,10 +37,10 @@ services:
     build:
       context: ./frontend
     volumes:
-      - ./frontend:/app
+      - ./frontend:/app/frontend
     ports:
       - 3000:3000
-    
+
   # maildev:
   #   image: maildev/maildev
   #   restart: always
@@ -56,5 +56,17 @@ services:
   #     options:
   #       max-size: "1m"
 
+  # minio:
+  #   image: minio/minio
+  #   container_name: minio
+  #   ports:
+  #     - "9000:9000"
+  #   environment:
+  #     - MINIO_ROOT_USER=${MINIO_USER}
+  #     - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY}
+  #   volumes:
+  #     - minio-data:/data
+
 volumes:
   db-data:
+  minio-data:
