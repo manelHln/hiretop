@@ -56,6 +56,8 @@ public class SecurityConfig {
                                 .permitAll()
                                 .requestMatchers(HttpMethod.GET, "industries/**")
                                 .permitAll()
+                                .requestMatchers(HttpMethod.GET, "skills/**")
+                                .permitAll()
                                 .anyRequest()
                                 .authenticated()
                                 //.permitAll()

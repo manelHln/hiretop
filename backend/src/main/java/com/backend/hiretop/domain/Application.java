@@ -6,6 +6,7 @@ import java.util.Date;
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.backend.hiretop.enums.ApplicationStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,12 +22,14 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "application")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -40,14 +43,8 @@ public class Application {
     @Column(name = "cover_letter", columnDefinition = "text")
     private String coverLetter;
 
-    @Column(name = "portfolio")
-    private String portfolio;
-
     @Column(name = "additionnal_information", columnDefinition = "text")
     private String additionnalInfo;
-
-    @Column(name = "resume")
-    private String resume;
 
     @Column(name = "status")
     @Enumerated(value = EnumType.ORDINAL)

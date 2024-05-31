@@ -2,6 +2,7 @@ package com.backend.hiretop.domain;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -23,6 +24,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
@@ -30,31 +33,33 @@ import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-
+import lombok.Setter;
 
 @Entity
 @Table(name = "applicant")
 @Builder
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Applicant implements UserDetails{
+public class Applicant implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "firstname")
-    private String firstname;
-
-    @Column(name = "lastname")
-    private String lastname;
+    @Column(name = "full_name")
+    private String fullName;
 
     @JsonIgnore
     @Column(name = "password")
     private String password;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
 
     @Column(name = "role")
     @Enumerated(value = EnumType.ORDINAL)
@@ -71,44 +76,87 @@ public class Applicant implements UserDetails{
     @Column(name = "about", columnDefinition = "text")
     private String about;
 
-    // @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "applicant")
+    @Column(name = "vocation")
+    private String vocation;
+
+    @Column(name = "location")
+    private String location;
+
+    @Column(name = "portfolio")
+    private String portfolio;
+
+    @Column(name = "facebook")
+    private String facebook;
+
+    @Column(name = "linkedin")
+    private String linkedin;
+
+    @Column(name = "twitter")
+    private String twitter;
+
+    @Column(name = "pinterest")
+    private String pinterest;
+
+    @Column(name = "dribble")
+    private String dribble;
+
+    // @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy =
+    // "applicant")
     // private Set<PhoneContact> contacts;
 
     @Column(name = "email")
     private String email;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "mail_contact_id")
-    private Set<MailContact> otherEmails;
+    // @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy =
+    // "applicant")
+    // private Set<MailContact> otherEmails;
 
     @Column(name = "profile_pic")
     private String profilePicture;
 
-    @Column(name = "resume")
-    private String resume;
+    // @Column(name = "resume")
+    // private String resume;
 
     @Column(name = "birthdate")
     @Temporal(value = TemporalType.DATE)
     private Date birthDate;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id")
-    private Set<Address> locations;
+    // @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy =
+    // "applicant")
+    // private Set<Address> locations;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "language_id")
-    private Set<Language> languages;
+    // @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy =
+    // "applicant")
+    // private Set<Language> languages;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "experience_id")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Experience> experiences;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "education_id")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Education> educations;
 
+    @Builder.Default
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "applicant_skill", joinColumns = @JoinColumn(name = "applicant_id"), inverseJoinColumns = @JoinColumn(name = "skill_id"))
+    private Set<Skill> skills = new HashSet<>();
+
+    @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "applicant")
     private Set<Application> applications;
+
+    @Builder.Default
+    @ManyToMany
+    @JsonIgnore
+    @JoinTable(name = "bookmark", joinColumns = @JoinColumn(name = "applicant_id"), inverseJoinColumns = @JoinColumn(name = "job_id"))
+    private Set<Job> bookmarkedJobs = new HashSet<>();
+
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "senderApplicant")
+    private Set<Message> sentMessages;
+
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "recipientApplicant")
+    private Set<Message> receivedMessages;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

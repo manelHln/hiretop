@@ -13,12 +13,7 @@ import lombok.Data;
 public class ApplicationDto {
     private String coverLetter;
 
-    private String portfolio;
-
     private String additionnalInfo;
-
-    @NotEmpty
-    private MultipartFile resume;
 
     private Job job;
 

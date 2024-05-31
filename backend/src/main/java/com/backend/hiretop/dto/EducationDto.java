@@ -9,12 +9,8 @@ import lombok.Setter;
 @Setter
 public class EducationDto {
     private String university;
-
     private String diploma;
-
     private String description;
-
-    private Date from;
-
-    private Date to;
+    private Date fromDate;
+    private Date toDate;
 }

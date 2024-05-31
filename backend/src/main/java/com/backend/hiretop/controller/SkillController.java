@@ -1,6 +1,7 @@
 package com.backend.hiretop.controller;
 
 import com.backend.hiretop.domain.Skill;
+import com.backend.hiretop.dto.ResponseVO;
 import com.backend.hiretop.service.SkillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +24,8 @@ public class SkillController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/")
-    public ResponseEntity<List<Skill>> getAllSkills() {
+    @GetMapping
+    public ResponseEntity<ResponseVO<List<Skill>>> getAllSkills() {
         return ResponseEntity.ok(skillService.getAllSkills());
     }
 

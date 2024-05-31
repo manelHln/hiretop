@@ -44,11 +44,5 @@ public class CompanyDto {
 
     private Set<String> skills;
 
-    private Set<Address> addresses;
-
-    private Set<PhoneContact> contacts;
-
-    private Set<MailContact> emails;
-
-    private Set<Industry> industries;
+    private Set<String> industries;
 }

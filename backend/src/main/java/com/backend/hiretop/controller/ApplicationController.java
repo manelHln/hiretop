@@ -2,13 +2,22 @@ package com.backend.hiretop.controller;
 
 import com.backend.hiretop.domain.Applicant;
 import com.backend.hiretop.domain.Application;
+import com.backend.hiretop.domain.Company;
+import com.backend.hiretop.dto.ResponsePageableVO;
 import com.backend.hiretop.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+
 
 @RestController
 @RequestMapping("/applications")
@@ -48,4 +57,14 @@ public class ApplicationController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @PostMapping("/schedule/{id}")
+    public ResponseEntity<Application> scheduleInterview(@PathVariable Long id, @RequestBody Date date, @AuthenticationPrincipal Company company) {
+        return ResponseEntity.ok(applicationService.scheduleInterview(id, date, company));
+    }
+
+    @PostMapping("/status/{id}")
+    public ResponseEntity<Application> setApplicationStatuResponseEntity(@RequestBody String status, @PathVariable Long id, @AuthenticationPrincipal Company company) {        
+        return ResponseEntity.ok(applicationService.updateApplicationStatus(id, status, company));
+    }    
 }

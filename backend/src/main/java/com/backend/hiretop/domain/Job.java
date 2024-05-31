@@ -28,12 +28,14 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "job")
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -50,21 +52,15 @@ public class Job {
     @Column(name = "description", columnDefinition = "text")
     private String description;
 
-    @Column(name = "responsibilities", columnDefinition = "text")
-    private String responsibilities;
-
-    @Column(name = "who_you_are", columnDefinition = "text")
-    private String whoYouAre;
-
-    @Column(name = "nice_to_have", columnDefinition = "text")
-    private String niceToHave;
-
     @Column(name = "level")
     @Enumerated(value = EnumType.ORDINAL)
     private JobLevel jobLevel;
 
-    @Column(name = "salary")
-    private Number salary;
+    @Column(name = "salary_from")
+    private Double salaryFrom;
+
+    @Column(name = "salary_to")
+    private Double salaryTo;
 
     @Column(name = "job_view")
     private int jobViews;
@@ -77,19 +73,22 @@ public class Job {
     @Enumerated(value = EnumType.ORDINAL)
     private JobStatus status;
 
+    @Column(name = "location")
+    private String location;
+
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdDate;
 
     @Builder.Default
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany
     @JoinTable(name = "job_skill",
                joinColumns = @JoinColumn(name = "job_id"),
                inverseJoinColumns = @JoinColumn(name = "skill_id"))
     private Set<Skill> skills = new HashSet<>();
 
     @Builder.Default
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany
     @JoinTable(name = "job_category",
                joinColumns = @JoinColumn(name = "job_id"),
                inverseJoinColumns = @JoinColumn(name = "category_id"))

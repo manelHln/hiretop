@@ -2,6 +2,7 @@ package com.backend.hiretop.service;
 
 import com.backend.hiretop.domain.Applicant;
 import com.backend.hiretop.domain.Application;
+import com.backend.hiretop.domain.Company;
 import com.backend.hiretop.domain.Job;
 import com.backend.hiretop.dto.ApplicationDto;
 import com.backend.hiretop.dto.ResponsePageableVO;
@@ -18,10 +19,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+import javax.management.RuntimeErrorException;
 
 @Service
 public class ApplicationService {
@@ -43,13 +49,43 @@ public class ApplicationService {
         return applicationRepository.findById(id);
     }
 
+    public Application updateApplicationStatus(Long id, String status, Company company) {
+        Application application = applicationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Application not found"));
+
+        Company jobOwner = application.getJob().getCompany();
+
+        if (!company.equals(jobOwner)) {
+            throw new SecurityException("You are not allowed to perform this action!!");
+        }
+        application.setStatus(ApplicationStatus.valueOf(status.toUpperCase()));
+        return applicationRepository.save(application);
+    }
+
+    public Application scheduleInterview(Long id, Date date, Company company) {
+        Application application = applicationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Application not found"));
+
+        Company jobOwner = application.getJob().getCompany();
+
+        if (!company.equals(jobOwner)) {
+            throw new SecurityException("You are not allowed to perform this action!!");
+        }
+
+        if (date.before(Date.from(Instant.now().plus(5, ChronoUnit.DAYS)))) {
+            throw new IllegalArgumentException("Please choose a valid date!! At least 5 days from now!!");
+        }
+
+        application.setStatus(ApplicationStatus.INTERVIEWING);
+        application.setInterviewDate(date);
+        return applicationRepository.save(application);
+    }
+
     public Application updateApplication(Long id, Application applicationDetails) {
         Application application = applicationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Application not found"));
         application.setCoverLetter(applicationDetails.getCoverLetter());
-        application.setPortfolio(applicationDetails.getPortfolio());
         application.setAdditionnalInfo(applicationDetails.getAdditionnalInfo());
-        application.setResume(applicationDetails.getResume());
         return applicationRepository.save(application);
     }
 
@@ -75,6 +111,16 @@ public class ApplicationService {
                 applications.getTotalElements(), applications.getTotalPages(), applications.isLast());
     }
 
+    public ResponsePageableVO<Application> getCompanyApplications(Company company, Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        Page<Application> applications = applicationRepository.findByJob_Company(company, pageable);
+        if (applications.isEmpty()) {
+            return new ResponsePageableVO<>(Collections.emptyList(), 0, 0, 0, 0, true);
+        }
+        return new ResponsePageableVO<>(applications.getContent(), applications.getNumber(), applications.getSize(),
+                applications.getTotalElements(), applications.getTotalPages(), applications.isLast());
+    }
+
     public Number countUserAppliedJobStatus(ApplicationStatus q, Applicant applicant) {
         return applicationRepository.countByApplicantAndStatus(applicant, q);
     }
@@ -82,14 +128,10 @@ public class ApplicationService {
     public ResponseVO<String> apply(Applicant applicant, long jobId, ApplicationDto request) {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new RuntimeException("There was an error retrieving job"));
-        String resume = "";
-        if(!request.getResume().isEmpty()){
-            resume = fileStorageService.store(request.getResume());
-        }
 
         Application application = Application.builder().additionnalInfo(request.getAdditionnalInfo())
                 .applicant(applicant).coverLetter(request.getCoverLetter())
-                .portfolio(request.getPortfolio()).resume(resume).status(ApplicationStatus.APPLIED).build();
+                .status(ApplicationStatus.APPLIED).job(job).build();
         applicationRepository.save(application);
         job.getApplications().add(application);
         jobRepository.save(job);

@@ -22,6 +22,9 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     long countByApplicantAndStatus(Applicant applicant, ApplicationStatus status);
     Page<Application> findByApplicantAndCreatedAtBetween(Applicant applicant, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
 
+    @Query("SELECT a FROM Application a WHERE a.job.company = :company")
+    Page<Application> findByJob_Company(@Param("company") Company company, Pageable pageable);
+
     @Query("SELECT COUNT(a) FROM Application a WHERE a.status = :status AND a.job.company.id = :companyId")
     long countByStatusAndCompanyId(@Param("status") ApplicationStatus status, @Param("companyId") Long companyId);
 }

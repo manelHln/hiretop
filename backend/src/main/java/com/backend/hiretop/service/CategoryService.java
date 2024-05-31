@@ -17,13 +17,19 @@ public class CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    public Category createCategory(String category, Job job) {
-        if (categoryRepository.existsByName(category)) {
-            return categoryRepository.findByName(category);
+    public Category createCategory(String categoryName, Job job) {
+        Category category = categoryRepository.findByName(categoryName)
+                                .orElseGet(() -> {
+                                    Category newCategory = new Category();
+                                    newCategory.setName(categoryName);
+                                    categoryRepository.save(newCategory);
+                                    return newCategory;
+                                });
+        if (!category.getJobs().contains(job)) {
+            category.getJobs().add(job);
+            job.getCategories().add(category); // Maintain bidirectional relationship
         }
-        Category cat = Category.builder().name(category).build();
-        cat.getJobs().add(job);
-        return categoryRepository.save(cat);
+        return categoryRepository.save(category);
     }
 
     public Optional<Category> getCategoryById(Long id) {
